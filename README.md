@@ -73,6 +73,16 @@ wrangler secret put GOOGLE_HOSTED_DOMAIN
 # Cookie Encryption
 wrangler secret put COOKIE_ENCRYPTION_KEY
 # Enter a strong random key for cookie encryption
+
+# AutoRAG Sync (Optional)
+wrangler secret put CLOUDFLARE_ACCOUNT_ID
+# Enter your Cloudflare Account ID for sync functionality
+
+wrangler secret put CLOUDFLARE_API_TOKEN
+# Enter API token with 'AutoRAG Write' permission
+
+wrangler secret put AUTORAG_ID
+# Enter your AutoRAG instance ID
 ```
 
 ### 4. Configure Cloudflare Resources
@@ -113,6 +123,9 @@ npm run deploy
 | `GOOGLE_CLIENT_SECRET` | Google OAuth 2.0 Client Secret | `GOCSPX-abcdefghijklmnopqrstuv` |
 | `GOOGLE_HOSTED_DOMAIN` | Restrict access to specific domain | `wavedigital.ai` |
 | `COOKIE_ENCRYPTION_KEY` | Key for encrypting OAuth cookies | `your-random-256-bit-key` |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare Account ID (optional) | `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6` |
+| `CLOUDFLARE_API_TOKEN` | API token with 'AutoRAG Write' permission (optional) | `your-api-token-here` |
+| `AUTORAG_ID` | Your AutoRAG instance ID (optional) | `your-autorag-instance-id` |
 
 ## 📱 Usage
 
@@ -132,8 +145,8 @@ npm run deploy
 - `searchNotes`: Search through all your notes
 - `searchNotesByDate`: Find notes within a date range
 
-#### 🎨 Image Generation
-- `generateImage`: Generate images using AI (Flux-1-Schnell model)
+#### 🔄 AutoRAG Sync
+- `sync_autorag`: Manually trigger AutoRAG sync to scan for changes and index new/updated files
 
 #### 🐛 Debug Tools
 - `debugStorage`: View R2 storage information
@@ -148,8 +161,8 @@ npm run deploy
 # Search notes
 "Search my notes for anything about 'product roadmap'"
 
-# Generate an image
-"Generate an image of a futuristic city at sunset"
+# Trigger AutoRAG sync after adding new notes
+"Sync AutoRAG to index my latest notes"
 
 # Search by date
 "Find all notes I created last week"

@@ -12,6 +12,10 @@ declare namespace Cloudflare {
 		COOKIE_ENCRYPTION_KEY: "1234567890";
 		MCP_OBJECT: DurableObjectNamespace<import("./src/index").MyMCP>;
 		NOTES: R2Bucket;
+		// AutoRAG Sync API credentials
+		CLOUDFLARE_ACCOUNT_ID?: "1234567890";
+		CLOUDFLARE_API_TOKEN?: "1234567890";
+		AUTORAG_ID?: "1234567890";
 	}
 }
 interface Env extends Cloudflare.Env {}
