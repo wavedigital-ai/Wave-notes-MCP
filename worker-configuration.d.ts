@@ -11,7 +11,6 @@ declare namespace Cloudflare {
 		GOOGLE_HOSTED_DOMAIN?: "1234567890";
 		COOKIE_ENCRYPTION_KEY: "1234567890";
 		MCP_OBJECT: DurableObjectNamespace<import("./src/index").MyMCP>;
-		AI: Ai;
 		NOTES: R2Bucket;
 	}
 }

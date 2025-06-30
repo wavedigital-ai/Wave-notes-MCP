@@ -6,7 +6,6 @@ import type { Props } from "./types.js";
 import { registerNoteTools } from "./tools/note-tools.js";
 import { registerSearchTools } from "./tools/search-tools.js";
 import { registerDebugTools } from "./tools/debug-tools.js";
-import { registerImageTools } from "./tools/image-tools.js";
 
 export class MyMCP extends McpAgent<Env, Record<string, never>, Props> {
 	server = new McpServer({
@@ -19,7 +18,6 @@ export class MyMCP extends McpAgent<Env, Record<string, never>, Props> {
 		registerNoteTools(this.server, this.props, this.env);
 		registerSearchTools(this.server, this.props, this.env);
 		registerDebugTools(this.server, this.props, this.env);
-		registerImageTools(this.server, this.props, this.env);
 	}
 }
 

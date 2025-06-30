@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Props, NoteMetadata, NoteSidecarData } from "../types.js";
 import { extractTags, extractLinks, generateTitle, createCustomMetadata } from "../utils/metadata.js";
+import { UserPaths } from "../utils.js";
 
 export function registerNoteTools(server: McpServer, props: Props, env: any) {
 	// Create note tool
@@ -18,7 +19,7 @@ export function registerNoteTools(server: McpServer, props: Props, env: any) {
 				.describe("Type of note for better organization and filtering"),
 		},
 		async ({ text, title, note_type }) => {
-			const user = props.email;
+			const user = UserPaths.getUser(props);
 			const id = crypto.randomUUID();
 			const timestamp = new Date();
 			
@@ -44,7 +45,7 @@ export function registerNoteTools(server: McpServer, props: Props, env: any) {
 				context: context // AutoRAG context field
 			});
 			
-			await env.NOTES.put(`${user}/${id}.md`, text, { 
+			await env.NOTES.put(UserPaths.getNotePath(user, id), text, { 
 				httpMetadata: {
 					contentType: 'text/markdown',
 				},
@@ -59,7 +60,7 @@ export function registerNoteTools(server: McpServer, props: Props, env: any) {
 				links: extractLinks(text),
 			};
 			
-			await env.NOTES.put(`${user}/.metadata/${id}.json`, JSON.stringify(sidecarData, null, 2), {
+			await env.NOTES.put(UserPaths.getMetadataPath(user, id), JSON.stringify(sidecarData, null, 2), {
 				httpMetadata: {
 					contentType: 'application/json',
 				},
@@ -72,8 +73,8 @@ export function registerNoteTools(server: McpServer, props: Props, env: any) {
 						id, 
 						metadata,
 						storage: {
-							note: `${user}/${id}.md`,
-							sidecar: `${user}/.metadata/${id}.json`
+							note: UserPaths.getNotePath(user, id),
+							sidecar: UserPaths.getMetadataPath(user, id)
 						}
 					}, null, 2),
 				}],
@@ -91,12 +92,12 @@ export function registerNoteTools(server: McpServer, props: Props, env: any) {
 				.describe("The UUID of the note to delete (must be exact UUID format)"),
 		},
 		async ({ note_id }) => {
-			const user = props.email;
+			const user = UserPaths.getUser(props);
 			
 			try {
 				// Define the paths for both files
-				const notePath = `${user}/${note_id}.md`;
-				const metadataPath = `${user}/.metadata/${note_id}.json`;
+				const notePath = UserPaths.getNotePath(user, note_id);
+				const metadataPath = UserPaths.getMetadataPath(user, note_id);
 				
 				// Check if the note exists before attempting deletion
 				const noteExists = await env.NOTES.head(notePath);
@@ -108,7 +109,7 @@ export function registerNoteTools(server: McpServer, props: Props, env: any) {
 								success: false,
 								error: "Note not found",
 								note_id: note_id,
-								user_folder: `${user}/`,
+								user_folder: UserPaths.getUserFolder(user),
 								message: `No note found with ID: ${note_id}`
 							}, null, 2)
 						}]

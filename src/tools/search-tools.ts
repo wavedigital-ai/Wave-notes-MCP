@@ -9,6 +9,7 @@ import {
 	performAutoRAGAISearch, 
 	enrichResultsWithMetadata 
 } from "../utils/autorag.js";
+import { UserPaths } from "../utils.js";
 
 export function registerSearchTools(server: McpServer, props: Props, env: any) {
 	// Simple AutoRAG search returning full content
@@ -24,7 +25,7 @@ export function registerSearchTools(server: McpServer, props: Props, env: any) {
 				.describe("Maximum number of results to return (default: 10, max: 50)"),
 		},
 		async ({ query, limit }) => {
-			const user = props.email;
+			const user = UserPaths.getUser(props);
 			
 			try {
 				const response = await performAutoRAGSearch(env.AI, {
@@ -46,7 +47,7 @@ export function registerSearchTools(server: McpServer, props: Props, env: any) {
 					content: [{
 						type: "text",
 						text: JSON.stringify({
-							user_folder: `${user}/`,
+							user_folder: UserPaths.getUserFolder(user),
 							search_query: response.search_query,
 							total_results: response.data.length,
 							filtered_results: noteResults.length,
@@ -90,7 +91,7 @@ export function registerSearchTools(server: McpServer, props: Props, env: any) {
 				.describe("Only include notes older than N days ago (e.g., 90 for notes older than 3 months)"),
 		},
 		async ({ query, limit, since_days, until_days }) => {
-			const user = props.email;
+			const user = UserPaths.getUser(props);
 			
 			try {
 				// Calculate timestamp filters if specified
@@ -128,7 +129,7 @@ export function registerSearchTools(server: McpServer, props: Props, env: any) {
 					content: [{
 						type: "text",
 						text: JSON.stringify({
-							user_folder: `${user}/`,
+							user_folder: UserPaths.getUserFolder(user),
 							search_query: response.search_query,
 							filters_applied: {
 								since_days: since_days || "all time",
@@ -170,7 +171,7 @@ export function registerSearchTools(server: McpServer, props: Props, env: any) {
 			} catch (error) {
 				// Fallback to R2 list if AutoRAG not available
 				const listed = await env.NOTES.list({
-					prefix: `${user}/`,
+					prefix: UserPaths.getUserFolder(user),
 					limit: 1000,
 				});
 				
@@ -228,7 +229,7 @@ export function registerSearchTools(server: McpServer, props: Props, env: any) {
 				.describe("Only consider notes older than N days ago (useful for historical analysis)"),
 		},
 		async ({ query, limit, since_days, until_days }) => {
-			const user = props.email;
+			const user = UserPaths.getUser(props);
 			
 			try {
 				// Calculate timestamp filters if specified

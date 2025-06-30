@@ -25,14 +25,22 @@ export function getUpstreamAuthorizeUrl({
 	state?: string;
 	hostedDomain?: string;
 }) {
-	const upstream = new URL(upstreamUrl);
-	upstream.searchParams.set("client_id", clientId);
-	upstream.searchParams.set("redirect_uri", redirectUri);
-	upstream.searchParams.set("scope", scope);
-	upstream.searchParams.set("response_type", "code");
-	if (state) upstream.searchParams.set("state", state);
-	if (hostedDomain) upstream.searchParams.set("hd", hostedDomain);
-	return upstream.href;
+	const params = new URLSearchParams({
+		client_id: clientId,
+		response_type: "code",
+		redirect_uri: redirectUri,
+		scope,
+	});
+
+	if (state) {
+		params.append("state", state);
+	}
+
+	if (hostedDomain) {
+		params.append("hd", hostedDomain);
+	}
+
+	return `${upstreamUrl}?${params.toString()}`;
 }
 
 /**
@@ -84,15 +92,37 @@ export async function fetchUpstreamAuthToken({
 		console.log(await resp.text());
 		return [null, new Response("Failed to fetch access token", { status: 500 })];
 	}
-
-	interface authTokenResponse {
-		access_token: string;
-	}
-
-	const body = (await resp.json()) as authTokenResponse;
-	if (!body.access_token) {
-		return [null, new Response("Missing access token", { status: 400 })];
-	}
-	return [body.access_token, null];
+	const respData = await resp.json() as { access_token: string };
+	return [respData.access_token, null];
 }
+
+/**
+ * User path utilities for consistent R2 storage organization
+ */
+export const UserPaths = {
+	/**
+	 * Get the user's email from props
+	 */
+	getUser: (props: { email: string }) => props.email,
+	
+	/**
+	 * Get the user's root folder path
+	 */
+	getUserFolder: (user: string) => `${user}/`,
+	
+	/**
+	 * Get the user's metadata folder path
+	 */
+	getMetadataFolder: (user: string) => `${user}/.metadata/`,
+	
+	/**
+	 * Get the full path for a note file
+	 */
+	getNotePath: (user: string, noteId: string) => `${user}/${noteId}.md`,
+	
+	/**
+	 * Get the full path for a note's metadata sidecar
+	 */
+	getMetadataPath: (user: string, noteId: string) => `${user}/.metadata/${noteId}.json`,
+};
 
