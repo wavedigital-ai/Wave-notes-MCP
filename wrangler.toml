@@ -1,0 +1,35 @@
+name = "autorag-notes-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-06-30"
+compatibility_flags = ["nodejs_compat"]
+
+# Re-enable workers.dev temporarily for dual-domain support
+workers_dev = true
+
+[vars]
+# All secrets are now stored as encrypted Worker secrets
+
+[[r2_buckets]]
+binding = "NOTES"
+bucket_name = "notes"
+
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "dd6ee09360bf4f68ba3b0945510f434b"
+
+[[durable_objects.bindings]]
+class_name = "MyMCP"
+name = "MCP_OBJECT"
+
+[[migrations]]
+new_sqlite_classes = ["MyMCP"]
+tag = "v1"
+
+[ai]
+binding = "AI"
+
+[observability]
+enabled = true
+
+[dev]
+port = 8788
